@@ -10,7 +10,7 @@ const Login = () => {
     localStorage.setItem('nickname', nickname);
     localStorage.setItem('password', password);
 
-    // You can also add more validation and error handling here
+    
   };
 
   return (
