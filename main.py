@@ -1,35 +1,37 @@
-import os
+import json
+import openpyxl
 
-def search_text_in_directory(directory, text_to_search):
-    total_occurrences = 0
+# Giriş ve çıkış dosya adları
+input_file = "input.xlsx"
+output_file = "output.xlsx"
 
-    for root, dirs, files in os.walk(directory):
-        for file in files:
-            if file.endswith(".js"):
-                file_path = os.path.join(root, file)
-                with open(file_path, 'r', encoding='utf-8') as f:
-                    content = f.read()
-                    occurrences = content.count(text_to_search)
-                    total_occurrences += occurrences
+# Giriş Excel dosyasını aç
+input_workbook = openpyxl.load_workbook(input_file)
+input_sheet = input_workbook.active
 
-    return total_occurrences
+# Çıktı verilerini tutacak liste
+output_data = []
 
-def search_multiple_words_in_project(directory, words_to_search):
-    word_occurrences = {}
+# Tüm hücreleri gez ve verileri JSON olarak yükle
+for row in input_sheet.iter_rows():
+    for cell in row:
+        value = cell.value
+        if value:
+            try:
+                data = json.loads("{" + value + "}")  # JSON olarak yükle
+                if isinstance(data, dict):
+                    for key in data.keys():
+                        output_data.append(key.strip())  # Sadece sol tarafları al
+            except json.JSONDecodeError:
+                pass  # Hatalı JSON geç, devam et
 
-    for word in words_to_search:
-        occurrences = search_text_in_directory(directory, word)
-        word_occurrences[word] = occurrences
+# Yeni bir Excel dosyası oluştur ve verileri yaz
+output_workbook = openpyxl.Workbook()
+output_sheet = output_workbook.active
+for data in output_data:
+    output_sheet.append([data])
 
-    return word_occurrences
+# Çıkış Excel dosyasını kaydet
+output_workbook.save(output_file)
 
-directory_to_search = r"C:\Users\hmmer\newsapi-app"
-words_to_search = [
-    'news-image','news-title'
-    # ... (other words)
-]
-
-word_occurrences = search_multiple_words_in_project(directory_to_search, words_to_search)
-
-for word, occurrences in word_occurrences.items():
-    print(f"'{word}' used {occurrences} times.")
+print("İşlem tamamlandı.")
