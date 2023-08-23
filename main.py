@@ -24,7 +24,7 @@ for (const cellAddress in input_sheet) {
             const data = JSON.parse('{' + value + '}'); // JSON olarak yükle
             if (typeof data === 'object' && data !== null) {
                 for (const key in data) {
-                    output_data.push(key.trim()); // Sadece sol tarafları al
+                    output_data.push([key.trim()]); // Sadece sol tarafları al
                 }
             }
         } catch (error) {
@@ -35,8 +35,7 @@ for (const cellAddress in input_sheet) {
 
 // Yeni bir Excel dosyası oluştur ve verileri yaz
 const output_workbook = xlsx.utils.book_new();
-const output_sheet_data = output_data.map(data => [data]);
-const output_sheet = xlsx.utils.aoa_to_sheet(output_sheet_data);
+const output_sheet = xlsx.utils.aoa_to_sheet(output_data);
 xlsx.utils.book_append_sheet(output_workbook, output_sheet, 'Sheet1');
 
 // Çıkış Excel dosyasını kaydet
