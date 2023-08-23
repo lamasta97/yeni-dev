@@ -3,14 +3,14 @@ const xlsx = require('xlsx');
 
 // Giriş ve çıkış dosya adları
 const input_file = 'input.xlsx';
-const output_file = 'output.xlsx';
+const output_file = 'output_list.txt';
 
 // Giriş Excel dosyasını aç
 const input_workbook = xlsx.readFile(input_file);
 const input_sheet = input_workbook.Sheets[input_workbook.SheetNames[0]];
 
 // Çıktı verilerini tutacak dizi
-const output_data = new Set(); // Using a Set to avoid duplicate keys
+const output_data = []; // Using an array to store the keys
 
 // Tüm hücreleri gez ve verileri JSON olarak yükle
 for (const cellAddress in input_sheet) {
@@ -23,18 +23,15 @@ for (const cellAddress in input_sheet) {
         const regex = /"([^"]+)":/g; // Match key names between quotes
         let match;
         while ((match = regex.exec(value)) !== null) {
-            output_data.add(`"${match[1]}"`); // Add key with double quotes
+            output_data.push(`' "${match[1]}" '`); // Add key with single quotes
         }
     }
 }
 
-// Yeni bir Excel dosyası oluştur ve verileri yaz
-const output_workbook = xlsx.utils.book_new();
-const output_sheet_data = Array.from(output_data).map(data => [data]);
-const output_sheet = xlsx.utils.aoa_to_sheet(output_sheet_data);
-xlsx.utils.book_append_sheet(output_workbook, output_sheet, 'Sheet1');
+// Oluşturulan verileri Python list formatına dönüştür
+const python_list = '[' + output_data.join(', ') + ']';
 
-// Çıkış Excel dosyasını kaydet
-xlsx.writeFile(output_workbook, output_file);
+// Python list formatını dosyaya yaz
+fs.writeFileSync(output_file, python_list);
 
 console.log('İşlem tamamlandı.');
