@@ -23,7 +23,7 @@ for (const cellAddress in input_sheet) {
         const regex = /"([^"]+)":/g; // Match key names between quotes
         let match;
         while ((match = regex.exec(value)) !== null) {
-            output_data.add(match[1]);
+            output_data.add(`"${match[1]}"`); // Add key with double quotes
         }
     }
 }
