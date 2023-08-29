@@ -1,16 +1,15 @@
 import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom'; 
 import './Login.css';
 
 const Login = () => {
   const [nickname, setNickname] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate();
 
   const handleLogin = () => {
-    // Save nickname and password to local storage
-    localStorage.setItem('nickname', nickname);
-    localStorage.setItem('password', password);
-
-    
+   
+    navigate('/news');
   };
 
   return (
@@ -29,6 +28,9 @@ const Login = () => {
         onChange={(e) => setPassword(e.target.value)}
       />
       <button onClick={handleLogin}>Login</button>
+      <p>
+        Don't have an account? <Link to="/news">Go to News</Link> {/* http://localhost:3000/news */}
+      </p>
     </div>
   );
 };
