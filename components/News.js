@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './News.css';
+import { Link, useNavigate } from 'react-router-dom';
+import { API_KEY } from './config.js';
 
 const defaultImages = [
-  'https://example.com/default-image-1.jpg',
-  'https://example.com/default-image-2.jpg',
-  
+  'https://i.stack.imgur.com/O3Vr0.jpg',
+  'https://thumbs.dreamstime.com/z/news-newspapers-folded-stacked-word-wooden-block-puzzle-dice-concept-newspaper-media-press-release-42301371.jpg?w=992',
 ];
 
 const getRandomDefaultImage = () => {
@@ -23,7 +24,7 @@ const NewsCard = ({ article, isSelected, onClick, onClose }) => {
       />
       <h3 className="news-title">{article.title}</h3>
       <p className="news-description">{article.description}</p>
-
+      
       {isSelected && (
         <div className="news-modal" onClick={onClose}>
           <div className="news-modal-content" onClick={(e) => e.stopPropagation()}>
@@ -48,16 +49,17 @@ const NewsCard = ({ article, isSelected, onClick, onClose }) => {
 };
 
 const News = () => {
+  const navigate = useNavigate(); 
   const [category, setCategory] = useState('politics');
   const [news, setNews] = useState([]);
   const [selectedModalIndex, setSelectedModalIndex] = useState(null);
 
   useEffect(() => {
     const fetchNews = async () => {
-      const apiKey = '5b56c3a81cb448ad98461fa2279f8d51'; // Your API key
+      
       try {
         const response = await axios.get(
-          `https://newsapi.org/v2/top-headlines?category=${category}&apiKey=${apiKey}`
+          `https://newsapi.org/v2/top-headlines?category=${category}&apiKey=${API_KEY}` 
         );
         setNews(response.data.articles);
       } catch (error) {
@@ -67,6 +69,24 @@ const News = () => {
 
     fetchNews();
   }, [category]);
+
+  useEffect(() => {
+    const inactiveTimeout = setTimeout(() => {
+      navigate('/'); 
+    }, 15000); 
+
+    const clearInactiveTimeout = () => {
+      clearTimeout(inactiveTimeout);
+    };
+
+    window.addEventListener('mousemove', clearInactiveTimeout);
+    window.addEventListener('keydown', clearInactiveTimeout);
+
+    return () => {
+      window.removeEventListener('mousemove', clearInactiveTimeout);
+      window.removeEventListener('keydown', clearInactiveTimeout);
+    };
+  }, [category, navigate]);
 
   return (
     <div className="news-container">
